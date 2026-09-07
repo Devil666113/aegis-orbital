@@ -1,0 +1,10 @@
+
+numpy
+sgp4
+requests
+pandas
+scipy
+flask
+flask-cors
+python-dotenv
+

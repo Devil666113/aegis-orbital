@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS ORBITAL | SECURE ACCESS</title>
+    <style>
+        :root {
+            --lm-blue: #004a99;
+            --lm-cyan: #00ffff;
+            --lm-amber: #ffb400;
+            --lm-red: #ff3c3c;
+            --bg-deep: #020508;
+            --panel-border: rgba(0, 74, 153, 0.4);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--bg-deep); color: var(--lm-cyan);
+            font-family: 'Consolas', monospace; overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        /* --- LOGIN SECTION --- */
+        #login-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; background: radial-gradient(circle, #001a33 0%, #020508 100%);
+            z-index: 100; position: absolute; width: 100%; transition: 0.8s ease-in-out;
+        }
+
+        .login-card {
+            background: rgba(0, 74, 153, 0.1); border: 1px solid var(--lm-cyan);
+            padding: 40px; border-radius: 4px; backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1); text-align: center;
+            width: 320px;
+        }
+
+        .login-card h2 { letter-spacing: 5px; margin-bottom: 30px; }
+
+        input {
+            width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--panel-border); color: white; outline: none; box-sizing: border-box;
+        }
+
+        input:focus { border-color: var(--lm-cyan); box-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
+
+        .btn-access {
+            width: 100%; padding: 15px; margin-top: 20px; background: var(--lm-blue);
+            color: white; border: none; font-weight: bold; cursor: pointer;
+            letter-spacing: 2px; transition: 0.3s;
+        }
+
+        .btn-access:hover { background: var(--lm-cyan); color: #000; box-shadow: 0 0 20px var(--lm-cyan); }
+
+        /* --- DASHBOARD SECTION --- */
+        #main-dashboard { display: none; height: 100vh; padding: 15px; box-sizing: border-box; }
+
+        .hud-grid {
+            display: grid; height: 100%; grid-template-columns: 320px 1fr 320px;
+            grid-template-rows: 60px 1fr 180px; gap: 15px;
+        }
+
+        .panel { background: rgba(0, 20, 40, 0.6); border: 1px solid var(--panel-border); padding: 12px; position: relative; }
+        .panel-header { background: var(--lm-blue); color: white; padding: 2px 8px; font-size: 10px; margin: -12px -12px 10px -12px; border-bottom: 1px solid var(--lm-cyan); }
+
+        /* Tactical Elements */
+        .radar-box { width: 300px; height: 300px; border: 1px solid var(--panel-border); border-radius: 50%; margin: auto; position: relative; align-self: center; }
+        .sweep { position: absolute; width: 100%; height: 100%; background: conic-gradient(from 0deg, rgba(0, 255, 255, 0.1), transparent 90deg); animation: rotate 5s linear infinite; border-radius: 50%; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .metric-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .metric-bar { height: 4px; background: #000; width: 80px; border: 1px solid var(--lm-blue); }
+        .fill { height: 100%; background: var(--lm-cyan); }
+
+        .risk-value { font-size: 2.5rem; color: var(--lm-red); font-weight: bold; }
+        .btn-execute { width: 100%; background: var(--lm-red); color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 9px; }
+        th { text-align: left; opacity: 0.5; border-bottom: 1px solid var(--lm-blue); }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>AEGIS ACCESS</h2>
+            <div style="font-size: 0.6rem; margin-bottom: 20px; opacity: 0.6;">RESTRICTED TO PERSONNEL ONLY</div>
+            <input type="text" placeholder="OPERATOR ID" id="op-id">
+            <input type="password" placeholder="SECURITY KEY" id="sec-key">
+            <button class="btn-access" onclick="unlockSystem()">AUTHORIZE ACCESS</button>
+        </div>
+        <div style="margin-top: 20px; font-size: 0.7rem; color: var(--lm-blue);">SYSTEM: IDLE // WAITING FOR CREDENTIALS</div>
+    </div>
+
+    <div id="main-dashboard">
+        <div class="hud-grid">
+            <div class="panel">
+                <div class="panel-header">ASSET_IDENT: [ AEGIS_01_ISS ]</div>
+                <div style="display:flex; justify-content:space-between"><span>ALT: 415.2 KM</span><span style="color:var(--lm-amber)">STATE: SCANNING</span></div>
+            </div>
+            <div style="text-align:center; align-self:center;"><h1 style="margin:0; letter-spacing: 10px;">AEGIS COMMAND</h1></div>
+            <div class="panel"><div class="panel-header">SIGNAL_LINK</div><div style="display:flex; justify-content:space-between"><span>PING: 14MS</span><span style="color:var(--lm-cyan)">STABLE</span></div></div>
+
+            <div class="panel" style="grid-row: 2;">
+                <div class="panel-header">SENSOR_DIAGNOSTICS</div>
+                <div class="metric-row"><span>SGP4_CORE</span><div class="metric-bar"><div class="fill" style="width: 100%"></div></div></div>
+                <div class="metric-row"><span>AI_ENGINE</span><div class="metric-bar"><div class="fill" style="width: 88%"></div></div></div>
+                <div class="panel-header" style="margin-top:20px">INTERCEPT_GEOMETRY</div>
+                <div style="height: 60px; border: 1px dashed var(--lm-blue); display:flex; align-items:center; justify-content:center; position:relative;">
+                    <div style="width:80%; height:1px; background:var(--lm-red); transform: rotate(-20deg);"></div>
+                </div>
+            </div>
+
+            <div class="radar-box" style="grid-column: 2; grid-row: 2;">
+                <div class="sweep"></div>
+                <div style="position:absolute; top:50%; left:50%; width:4px; height:4px; background:white;"></div>
+                <div style="position:absolute; top:35%; left:65%; width:6px; height:6px; background:var(--lm-red); box-shadow:0 0 5px var(--lm-red);"></div>
+            </div>
+
+            <div class="panel" style="grid-row: 2;">
+                <div class="panel-header">DEBRIS_MANIFEST</div>
+                <table>
+                    <thead><tr><th>ID</th><th>RANGE</th><th>RISK</th></tr></thead>
+                    <tbody>
+                        <tr><td>#44912</td><td style="color:var(--lm-red)">1.2KM</td><td>HIGH</td></tr>
+                        <tr><td>#33019</td><td>5.8KM</td><td>LOW</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel" style="grid-column: 2; grid-row: 3;">
+                <div class="panel-header">AI_MITIGATION_ADVISORY</div>
+                <div style="display:flex; justify-content:space-around; align-items:center; height:100%;">
+                    <div style="text-align:center"><div class="label">PROBABILITY</div><div class="risk-value">71.2%</div></div>
+                    <div style="width:200px">
+                        <div style="margin-bottom:5px">ADVISORY: <span style="color:var(--lm-amber)">RETRO_BURN</span></div>
+                        <button class="btn-execute">EXECUTE MANEUVER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function unlockSystem() {
+            const op = document.getElementById('op-id').value;
+            const key = document.getElementById('sec-key').value;
+            
+            // Simple validation for the demo
+            if (op && key) {
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('main-dashboard').style.display = 'block';
+                }, 800);
+            } else {
+                alert("ACCESS DENIED: INVALID CREDENTIALS");
+            }
+        }
+    </script>
+</body>
+</html>
